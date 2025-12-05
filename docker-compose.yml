@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  interceptor-ui:
+    image: interceptor-validator-ui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.interceptor-ui.rule=Host(`interceptor.seudominio.com.br`)"
+        - "traefik.http.routers.interceptor-ui.entrypoints=websecure"
+        - "traefik.http.routers.interceptor-ui.tls.certresolver=myresolver"
+        - "traefik.http.services.interceptor-ui.loadbalancer.server.port=80"
+      restart_policy:
+        condition: on-failure
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
+    name: traefik-public
